@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0d0d0d" />
+<title>Ember — Warm up. Loosen up. Feel better.</title>
+<style>
+  :root {
+    --bg:         #0d0d0d;
+    --surface:    #1a1a1a;
+    --surface-2:  #242424;
+    --border:     #2e2e2e;
+    --text:       #ededed;
+    --text-dim:   #9a9a9a;
+    --primary:    #ff7a1a;
+    --primary-2:  #ff9144;
+    --red-deep:   #b91c1c;
+    --red:        #ef4444;
+    --amber:      #fbbf24;
+    --gentle:     #22c55e;
+    --moderate:   #fbbf24;
+    --intense:    #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body {
+    max-width: 480px;
+    margin: 0 auto;
+    padding-bottom: 96px;
+    position: relative;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  img { max-width: 100%; display: block; }
+  h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; }
+
+  /* ---------------- Header ---------------- */
+  .header {
+    padding: 24px 20px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 22px; font-weight: 800; letter-spacing: -0.03em;
+  }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: linear-gradient(160deg, var(--red-deep), var(--primary), var(--amber));
+    box-shadow: 0 4px 20px rgba(255, 122, 26, 0.35);
+    display: grid; place-items: center;
+    font-size: 18px;
+  }
+  .avatar-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    display: grid; place-items: center;
+    color: var(--text-dim);
+  }
+
+  /* ---------------- Views ---------------- */
+  .view { padding: 0 20px; animation: fadeIn 0.3s ease; }
+  .view.hidden { display: none; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Home */
+  .hero {
+    padding: 8px 0 16px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: start;
+  }
+  .hero h1 { font-size: 36px; line-height: 1.05; }
+  .hero p { color: var(--text-dim); font-size: 15px; margin-top: 8px; line-height: 1.4; }
+  .streak-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 14px 16px;
+    text-align: center;
+    min-width: 92px;
+    position: relative;
+    overflow: hidden;
+  }
+  .streak-card::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 10%, rgba(255, 122, 26, 0.15), transparent 60%);
+    pointer-events: none;
+  }
+  .streak-flame {
+    font-size: 28px; line-height: 1;
+    filter: drop-shadow(0 0 12px rgba(255, 122, 26, 0.6));
+  }
+  .streak-num {
+    font-size: 30px; font-weight: 800; margin-top: 2px;
+    background: linear-gradient(180deg, var(--amber), var(--primary));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .streak-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* Body map */
+  .bodymap-wrap {
+    position: relative;
+    margin: 12px auto 20px;
+    max-width: 420px;
+  }
+  .bodymap-toggle {
+    display: flex;
+    gap: 6px;
+    padding: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    width: fit-content;
+    margin: 0 auto 12px;
+  }
+  .bodymap-toggle button {
+    padding: 6px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    transition: all 0.2s;
+  }
+  .bodymap-toggle button.active {
+    background: var(--primary);
+    color: #000;
+    box-shadow: 0 2px 12px rgba(255, 122, 26, 0.4);
+  }
+  .bodymap-svg {
+    width: 100%;
+    aspect-ratio: 2/3;
+    background: radial-gradient(ellipse at center, #141414 0%, #0a0a0a 80%);
+    border-radius: 24px;
+    border: 1px solid var(--border);
+  }
+  .hotspot {
+    cursor: pointer;
+    transition: all 0.25s ease;
+    fill: rgba(239, 68, 68, 0);
+    stroke: rgba(239, 68, 68, 0.25);
+    stroke-width: 1.5;
+  }
+  .hotspot:hover {
+    fill: url(#hotspotGradient);
+    stroke: rgba(239, 68, 68, 0.8);
+    filter: drop-shadow(0 0 14px rgba(239, 68, 68, 0.7));
+  }
+  .hotspot-label {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  }
+  .hotspot-label.visible { opacity: 1; }
+
+  /* Section headers */
+  .section-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin: 24px 0 12px;
+  }
+  .section-head h2 { font-size: 20px; }
+  .section-head button { color: var(--primary); font-weight: 600; font-size: 14px; }
+
+  /* Stretch cards */
+  .stretch-row { display: grid; gap: 12px; }
+  .stretch-card {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 12px;
+    align-items: center;
+    text-align: left;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  .stretch-card:hover, .stretch-card:active {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(255, 122, 26, 0.1);
+  }
+  .stretch-thumb {
+    width: 96px; height: 96px;
+    border-radius: 14px;
+    background-color: #1a0f08;
+    background-size: cover; background-position: center;
+    overflow: hidden;
+  }
+  .stretch-info h3 { font-size: 16px; margin-bottom: 4px; }
+  .stretch-meta {
+    display: flex; gap: 10px; align-items: center;
+    font-size: 13px; color: var(--text-dim);
+  }
+  .stretch-duration::before {
+    content: "⏱"; margin-right: 4px;
+  }
+  .difficulty-badge {
+    padding: 2px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .difficulty-Gentle   { background: rgba(34, 197, 94, 0.15); color: var(--gentle); }
+  .difficulty-Moderate { background: rgba(251, 191, 36, 0.15); color: var(--moderate); }
+  .difficulty-Intense  { background: rgba(239, 68, 68, 0.15); color: var(--intense); }
+
+  /* Body scan CTA */
+  .scan-cta {
+    margin-top: 20px;
+    background: linear-gradient(135deg, rgba(255, 122, 26, 0.15), rgba(239, 68, 68, 0.1));
+    border: 1px solid rgba(255, 122, 26, 0.3);
+    border-radius: 20px;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 14px;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+  }
+  .scan-cta-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: var(--bg);
+    display: grid; place-items: center;
+    font-size: 24px;
+  }
+  .scan-cta h4 { font-size: 15px; margin-bottom: 2px; }
+  .scan-cta p { font-size: 13px; color: var(--text-dim); line-height: 1.3; }
+  .scan-cta-arrow {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--primary); color: #000;
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 16px;
+  }
+
+  /* ---------------- List view ---------------- */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 0;
+    color: var(--text-dim);
+    font-size: 14px; font-weight: 500;
+  }
+  .back-btn:hover { color: var(--text); }
+  .list-header { padding: 12px 0 20px; }
+  .list-header h1 { font-size: 28px; text-transform: capitalize; }
+  .list-header p { color: var(--text-dim); margin-top: 6px; font-size: 14px; }
+
+  /* ---------------- Detail view ---------------- */
+  .detail-hero {
+    margin: 16px -20px 24px;
+    aspect-ratio: 16/11;
+    max-height: 360px;
+    background: linear-gradient(135deg, #2a1810, #0d0d0d);
+    background-size: cover; background-position: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    margin-left: 0; margin-right: 0;
+  }
+  .detail-hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(13, 13, 13, 0.6));
+    pointer-events: none;
+  }
+  .detail-fav {
+    position: absolute; top: 16px; right: 16px;
+    width: 44px; height: 44px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 20px;
+    z-index: 2;
+  }
+  .detail-fav.active { color: var(--red); }
+
+  .detail-title { font-size: 28px; margin-bottom: 8px; }
+  .detail-meta {
+    display: flex; gap: 10px; align-items: center;
+    margin-bottom: 20px;
+  }
+  .detail-desc { color: var(--text-dim); line-height: 1.5; margin-bottom: 24px; }
+
+  .steps-list { display: grid; gap: 10px; margin-bottom: 24px; }
+  .step-item {
+    display: grid;
+    grid-template-columns: 28px 72px 1fr auto;
+    gap: 12px;
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    align-items: center;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255, 122, 26, 0.15);
+    color: var(--primary);
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 13px;
+  }
+  .step-thumb {
+    width: 72px; height: 54px;
+    border-radius: 10px;
+    background-color: #1a0f08;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+  }
+  .step-text { font-size: 14px; line-height: 1.4; }
+  .step-time { color: var(--text-dim); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+  .start-btn {
+    position: fixed;
+    bottom: 96px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 440px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, var(--primary), var(--red-deep));
+    color: #fff;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    box-shadow: 0 8px 28px rgba(255, 122, 26, 0.4);
+    transition: all 0.2s;
+    z-index: 50;
+  }
+  .start-btn:active { transform: translateX(-50%) scale(0.98); }
+
+  /* ---------------- Session (fullscreen) ---------------- */
+  .session {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center top, #1a0a05 0%, #0a0505 50%, #000 100%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 20px 40px;
+    animation: fadeIn 0.4s ease;
+    overflow-y: auto;
+  }
+  .session-image {
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 3/4;
+    border-radius: 24px;
+    background-color: #1a0f08;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 12px 40px rgba(255, 122, 26, 0.25), 0 0 0 1px rgba(255, 122, 26, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .session-image::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10, 5, 5, 0.35) 0%, transparent 30%, transparent 70%, rgba(10, 5, 5, 0.5));
+    pointer-events: none;
+  }
+  .session.hidden { display: none; }
+  .session-top {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 440px;
+  }
+  .session-close, .session-mute {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid; place-items: center;
+    font-size: 18px; color: var(--text-dim);
+  }
+  .session-progress {
+    font-size: 13px; color: var(--text-dim);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .timer-ring {
+    width: 110px;
+    aspect-ratio: 1;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(10, 5, 5, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 2;
+  }
+  .timer-ring svg {
+    width: 100%; height: 100%;
+    transform: rotate(-90deg);
+  }
+  .ring-track { stroke: rgba(255, 255, 255, 0.06); fill: none; stroke-width: 10; }
+  .ring-progress {
+    stroke: url(#ringGradient); fill: none; stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear;
+    filter: drop-shadow(0 0 12px rgba(255, 122, 26, 0.7));
+  }
+  .timer-inner {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    gap: 4px;
+  }
+  .timer-number {
+    font-size: 32px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, #fff, var(--primary));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .timer-unit { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.18em; margin-top: 2px; }
+  .session-step {
+    text-align: center;
+    max-width: 400px;
+    padding: 0 20px;
+  }
+  .session-step-label {
+    font-size: 12px; color: var(--primary);
+    text-transform: uppercase; letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+  .session-step-text { font-size: 22px; font-weight: 600; line-height: 1.3; }
+  .session-controls {
+    display: flex; gap: 16px; align-items: center;
+  }
+  .session-btn {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: grid; place-items: center;
+    font-size: 20px;
+    transition: all 0.2s;
+  }
+  .session-btn:active { transform: scale(0.94); }
+  .session-btn-primary {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, var(--primary), var(--red-deep));
+    border: none;
+    box-shadow: 0 8px 28px rgba(255, 122, 26, 0.5);
+    font-size: 28px;
+    color: #fff;
+  }
+
+  /* Session complete */
+  .session-complete {
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+  }
+  .session-complete-icon {
+    font-size: 72px;
+    filter: drop-shadow(0 0 30px rgba(255, 122, 26, 0.8));
+    margin-bottom: 16px;
+  }
+  .session-complete h2 { font-size: 32px; margin-bottom: 8px; }
+  .session-complete p { color: var(--text-dim); margin-bottom: 32px; }
+
+  /* ---------------- Bottom nav ---------------- */
+  .nav {
+    position: fixed;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: rgba(13, 13, 13, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+    z-index: 40;
+  }
+  .nav button {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    padding: 8px 4px;
+    color: var(--text-dim);
+    font-size: 11px; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav button.active { color: var(--primary); }
+  .nav-icon { font-size: 20px; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 24px; left: 50%; transform: translateX(-50%) translateY(-120%);
+    background: var(--surface);
+    border: 1px solid var(--primary);
+    color: var(--text);
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
+    z-index: 200;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+
+  /* Disclaimer */
+  .disclaimer {
+    margin: 32px 0 8px;
+    padding: 14px 16px;
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 14px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-dim);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+  .disclaimer-icon {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--red);
+  }
+  .disclaimer strong { color: var(--text); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="brand">
+    <div class="brand-mark">🔥</div>
+    <div>Ember</div>
+  </div>
+  <button class="avatar-btn" aria-label="Profile">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
+  </button>
+</header>
+
+<!-- HOME VIEW -->
+<section id="view-home" class="view">
+  <div class="hero">
+    <div>
+      <h1>What feels<br/>tight?</h1>
+      <p>Tap a muscle group to get stretches that actually help.</p>
+    </div>
+    <div class="streak-card">
+      <div class="streak-flame">🔥</div>
+      <div class="streak-num" id="streak-num">0</div>
+      <div class="streak-label">Day Streak</div>
+    </div>
+  </div>
+
+  <!-- Body map -->
+  <div class="bodymap-wrap">
+    <div class="bodymap-toggle">
+      <button data-view="back" class="active">Back</button>
+      <button data-view="front">Front</button>
+    </div>
+
+    <svg class="bodymap-svg" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <radialGradient id="hotspotGradient" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.7"/>
+          <stop offset="60%" stop-color="#b91c1c" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#b91c1c" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Body image (drop your file into ./body-back.png and ./body-front.png) -->
+      <image id="body-img" href="body-back.png" x="0" y="0" width="400" height="600" preserveAspectRatio="xMidYMid meet"/>
+
+      <!-- BACK hotspots -->
+      <g id="hotspots-back">
+        <ellipse class="hotspot" data-part="neck" cx="200" cy="108" rx="22" ry="18"/>
+        <ellipse class="hotspot" data-part="shoulders" cx="158" cy="168" rx="26" ry="22"/>
+        <ellipse class="hotspot" data-part="shoulders" cx="242" cy="168" rx="26" ry="22"/>
+        <ellipse class="hotspot" data-part="upper-back" cx="200" cy="200" rx="44" ry="32"/>
+        <ellipse class="hotspot" data-part="lower-back" cx="200" cy="290" rx="42" ry="28"/>
+        <ellipse class="hotspot" data-part="hips" cx="170" cy="360" rx="26" ry="24"/>
+        <ellipse class="hotspot" data-part="hips" cx="230" cy="360" rx="26" ry="24"/>
+        <ellipse class="hotspot" data-part="legs" cx="172" cy="460" rx="26" ry="40"/>
+        <ellipse class="hotspot" data-part="legs" cx="228" cy="460" rx="26" ry="40"/>
+      </g>
+
+      <!-- FRONT hotspots (hidden by default) -->
+      <g id="hotspots-front" style="display:none">
+        <ellipse class="hotspot" data-part="neck" cx="200" cy="108" rx="22" ry="18"/>
+        <ellipse class="hotspot" data-part="shoulders" cx="158" cy="168" rx="26" ry="22"/>
+        <ellipse class="hotspot" data-part="shoulders" cx="242" cy="168" rx="26" ry="22"/>
+        <ellipse class="hotspot" data-part="chest" cx="200" cy="205" rx="42" ry="26"/>
+        <ellipse class="hotspot" data-part="hips" cx="170" cy="355" rx="26" ry="24"/>
+        <ellipse class="hotspot" data-part="hips" cx="230" cy="355" rx="26" ry="24"/>
+        <ellipse class="hotspot" data-part="legs" cx="172" cy="460" rx="26" ry="44"/>
+        <ellipse class="hotspot" data-part="legs" cx="228" cy="460" rx="26" ry="44"/>
+      </g>
+    </svg>
+    <div id="hotspot-label" class="hotspot-label"></div>
+  </div>
+
+  <!-- Recent stretches -->
+  <div class="section-head">
+    <h2>Recent Stretches</h2>
+    <button id="view-all-btn">View all</button>
+  </div>
+  <div id="recent-stretches" class="stretch-row"></div>
+
+  <!-- Body scan CTA -->
+  <button class="scan-cta" id="body-scan-btn">
+    <div class="scan-cta-icon">⚡</div>
+    <div>
+      <h4>Not sure what's tight?</h4>
+      <p>Take a 60-second body scan and we'll recommend stretches for you.</p>
+    </div>
+    <div class="scan-cta-arrow">›</div>
+  </button>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <div class="disclaimer-icon">⚠</div>
+    <div>
+      <strong>For demonstration purposes only.</strong> Ember is a portfolio project — not medical advice. These stretches are not reviewed by a licensed professional. Consult a doctor or physical therapist before starting any exercise routine, especially if you have an injury or medical condition. You perform any exercise at your own risk.
+    </div>
+  </div>
+</section>
+
+<!-- LIST VIEW -->
+<section id="view-list" class="view hidden">
+  <button class="back-btn" data-back>← Back</button>
+  <div class="list-header">
+    <h1 id="list-title">Stretches</h1>
+    <p id="list-count"></p>
+  </div>
+  <div id="list-stretches" class="stretch-row"></div>
+</section>
+
+<!-- DETAIL VIEW -->
+<section id="view-detail" class="view hidden">
+  <button class="back-btn" data-back>← Back</button>
+  <div class="detail-hero" id="detail-hero">
+    <button class="detail-fav" id="detail-fav" aria-label="Favorite">♡</button>
+  </div>
+  <h1 class="detail-title" id="detail-title"></h1>
+  <div class="detail-meta">
+    <span class="stretch-duration" id="detail-duration"></span>
+    <span class="difficulty-badge" id="detail-difficulty"></span>
+  </div>
+  <p class="detail-desc" id="detail-desc"></p>
+  <h3 style="font-size:16px; margin-bottom:12px;">Steps</h3>
+  <div class="steps-list" id="detail-steps"></div>
+  <button class="start-btn" id="start-session-btn">Start Guided Session  ▶</button>
+</section>
+
+<!-- FAVORITES VIEW -->
+<section id="view-favorites" class="view hidden">
+  <div class="list-header" style="padding-top: 8px;">
+    <h1>Favorites</h1>
+    <p>Your saved stretches</p>
+  </div>
+  <div id="favorites-list" class="stretch-row"></div>
+</section>
+
+<!-- EXPLORE VIEW -->
+<section id="view-explore" class="view hidden">
+  <div class="list-header" style="padding-top: 8px;">
+    <h1>Explore</h1>
+    <p>Every stretch in the library</p>
+  </div>
+  <div id="explore-list" class="stretch-row"></div>
+</section>
+
+<!-- PROFILE VIEW -->
+<section id="view-profile" class="view hidden">
+  <div class="list-header" style="padding-top: 8px;">
+    <h1>Profile</h1>
+  </div>
+  <div class="streak-card" style="padding: 24px; margin-bottom: 16px;">
+    <div class="streak-flame">🔥</div>
+    <div class="streak-num" id="profile-streak">0</div>
+    <div class="streak-label">Day Streak</div>
+  </div>
+  <div class="streak-card" style="padding: 24px; margin-bottom: 16px;">
+    <div style="font-size: 28px;">✅</div>
+    <div class="streak-num" id="profile-sessions">0</div>
+    <div class="streak-label">Sessions Completed</div>
+  </div>
+  <div class="streak-card" style="padding: 24px;">
+    <div style="font-size: 28px;">⏱</div>
+    <div class="streak-num" id="profile-minutes">0</div>
+    <div class="streak-label">Minutes Stretched</div>
+  </div>
+</section>
+
+<!-- SESSION (fullscreen overlay) -->
+<div id="session" class="session hidden">
+  <div class="session-top">
+    <button class="session-close" id="session-close" aria-label="Close">✕</button>
+    <div class="session-progress" id="session-progress">Step 1 of 4</div>
+    <button class="session-mute" id="session-mute" aria-label="Mute voice">🔊</button>
+  </div>
+
+  <div id="session-active" style="display:flex; flex-direction:column; align-items:center; gap:20px; width:100%;">
+    <div class="session-image" id="session-image">
+      <div class="timer-ring">
+        <svg viewBox="0 0 200 200">
+          <defs>
+            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fbbf24"/>
+              <stop offset="50%" stop-color="#ff7a1a"/>
+              <stop offset="100%" stop-color="#b91c1c"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-track" cx="100" cy="100" r="90"/>
+          <circle class="ring-progress" id="ring-progress" cx="100" cy="100" r="90"
+                  stroke-dasharray="565" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-inner">
+          <div class="timer-number" id="timer-number">0</div>
+          <div class="timer-unit">sec</div>
+        </div>
+      </div>
+    </div>
+    <div class="session-step">
+      <div class="session-step-label">Now</div>
+      <div class="session-step-text" id="session-step-text">Get ready...</div>
+    </div>
+  </div>
+
+  <div id="session-complete-screen" class="session-complete" style="display:none">
+    <div class="session-complete-icon">🔥</div>
+    <h2>Session complete</h2>
+    <p id="complete-summary">Nice work.</p>
+  </div>
+
+  <div class="session-controls" id="session-controls">
+    <button class="session-btn" id="session-prev" aria-label="Previous step">⏮</button>
+    <button class="session-btn session-btn-primary" id="session-play" aria-label="Pause">⏸</button>
+    <button class="session-btn" id="session-next" aria-label="Next step">⏭</button>
+  </div>
+</div>
+
+<!-- Bottom nav -->
+<nav class="nav">
+  <button data-nav="home" class="active">
+    <div class="nav-icon">🏠</div>
+    <div>Home</div>
+  </button>
+  <button data-nav="explore">
+    <div class="nav-icon">🔍</div>
+    <div>Explore</div>
+  </button>
+  <button data-nav="favorites">
+    <div class="nav-icon">❤️</div>
+    <div>Favorites</div>
+  </button>
+  <button data-nav="profile">
+    <div class="nav-icon">👤</div>
+    <div>Profile</div>
+  </button>
+</nav>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------------- Data ----------------
+  const STRETCHES = [
+    {
+      id: "neck-side",
+      title: "Neck Side Stretch",
+      bodyPart: "neck",
+      duration: 3,
+      difficulty: "Gentle",
+      image: "stretches/neck-side.jpg",
+      description: "Releases tension in the sides of the neck and upper traps. Perfect for anyone who spends hours at a screen.",
+      steps: [
+        { text: "Sit tall with your shoulders relaxed and spine long.", seconds: 10 },
+        { text: "Slowly tilt your right ear toward your right shoulder.", seconds: 10 },
+        { text: "Rest your right hand gently on top of your head — no pulling.", seconds: 10 },
+        { text: "Breathe deeply and hold the stretch.", seconds: 30 },
+        { text: "Slowly return to center. Switch sides and repeat.", seconds: 40 },
+      ],
+    },
+    {
+      id: "neck-tuck",
+      title: "Upper Trap Release",
+      bodyPart: "neck",
+      duration: 2,
+      difficulty: "Gentle",
+      image: "stretches/neck-tuck.jpg",
+      description: "Loosens the base of the skull and upper traps.",
+      steps: [
+        { text: "Sit tall, eyes forward.", seconds: 8 },
+        { text: "Tuck your chin gently toward your chest.", seconds: 10 },
+        { text: "Clasp your hands behind your head, letting gravity deepen the stretch.", seconds: 30 },
+        { text: "Breathe. Don't pull — just hold.", seconds: 30 },
+        { text: "Slowly release and roll your head up.", seconds: 10 },
+      ],
+    },
+    {
+      id: "shoulder-cross",
+      title: "Cross-Body Shoulder",
+      bodyPart: "shoulders",
+      duration: 2,
+      difficulty: "Gentle",
+      image: "stretches/shoulder-cross.jpg",
+      description: "Opens the rear deltoid and upper back.",
+      steps: [
+        { text: "Stand tall with feet hip-width apart.", seconds: 5 },
+        { text: "Bring your right arm straight across your chest.", seconds: 8 },
+        { text: "Hook your left hand around the right elbow and gently pull in.", seconds: 10 },
+        { text: "Hold and breathe.", seconds: 30 },
+        { text: "Release. Switch sides.", seconds: 40 },
+      ],
+    },
+    {
+      id: "thread-needle",
+      title: "Thread the Needle",
+      bodyPart: "shoulders",
+      duration: 3,
+      difficulty: "Moderate",
+      image: "stretches/thread-needle.jpg",
+      description: "Deep release for the shoulder blades and thoracic spine.",
+      steps: [
+        { text: "Start on hands and knees, hips stacked over knees.", seconds: 8 },
+        { text: "Slide your right arm under your body, palm up.", seconds: 10 },
+        { text: "Rest your right cheek and shoulder on the floor.", seconds: 8 },
+        { text: "Breathe deeply into the upper back.", seconds: 30 },
+        { text: "Unwind slowly and switch sides.", seconds: 45 },
+      ],
+    },
+    {
+      id: "cat-cow",
+      title: "Cat-Cow Flow",
+      bodyPart: "upper-back",
+      duration: 3,
+      difficulty: "Gentle",
+      image: "stretches/cat-cow.jpg",
+      description: "Mobilizes the entire spine with breath.",
+      steps: [
+        { text: "Start on hands and knees, neutral spine.", seconds: 8 },
+        { text: "Inhale — drop belly, lift chest and tailbone (cow).", seconds: 6 },
+        { text: "Exhale — round the back, tuck the tailbone (cat).", seconds: 6 },
+        { text: "Continue flowing with breath.", seconds: 60 },
+        { text: "Return to neutral and rest.", seconds: 10 },
+      ],
+    },
+    {
+      id: "thoracic-rotation",
+      title: "Thoracic Rotation",
+      bodyPart: "upper-back",
+      duration: 3,
+      difficulty: "Moderate",
+      image: "stretches/thoracic-rotation.jpg",
+      description: "Unlocks stiffness between the shoulder blades.",
+      steps: [
+        { text: "Lie on your right side, knees bent to 90°.", seconds: 8 },
+        { text: "Stack your arms straight in front of you.", seconds: 5 },
+        { text: "Slowly sweep your top arm up and over to the other side.", seconds: 10 },
+        { text: "Follow with your eyes. Let the upper back open.", seconds: 30 },
+        { text: "Return and switch sides.", seconds: 40 },
+      ],
+    },
+    {
+      id: "childs-pose",
+      title: "Child's Pose",
+      bodyPart: "lower-back",
+      duration: 3,
+      difficulty: "Gentle",
+      image: "stretches/childs-pose.jpg",
+      description: "Classic release for the lower back and hips.",
+      steps: [
+        { text: "Kneel on the floor with big toes touching.", seconds: 8 },
+        { text: "Sit back onto your heels. Knees can be wide.", seconds: 8 },
+        { text: "Fold forward, reaching arms long on the floor.", seconds: 10 },
+        { text: "Let your forehead rest down. Breathe into your back.", seconds: 60 },
+        { text: "Walk your hands back and rise slowly.", seconds: 10 },
+      ],
+    },
+    {
+      id: "supine-twist",
+      title: "Knees-to-Chest Twist",
+      bodyPart: "lower-back",
+      duration: 3,
+      difficulty: "Gentle",
+      image: "stretches/supine-twist.jpg",
+      description: "Gentle spinal decompression — feels amazing after sitting.",
+      steps: [
+        { text: "Lie on your back, knees pulled to chest.", seconds: 10 },
+        { text: "Open your arms wide in a T.", seconds: 5 },
+        { text: "Lower both knees gently to the right.", seconds: 8 },
+        { text: "Turn your head left. Breathe and soften.", seconds: 30 },
+        { text: "Return to center. Switch sides.", seconds: 35 },
+      ],
+    },
+    {
+      id: "pigeon",
+      title: "Pigeon Pose",
+      bodyPart: "hips",
+      duration: 4,
+      difficulty: "Intense",
+      image: "stretches/pigeon.jpg",
+      description: "Deep hip opener. Go slow — this one is intense.",
+      steps: [
+        { text: "From hands and knees, bring your right knee behind your right wrist.", seconds: 10 },
+        { text: "Extend your left leg straight back, top of foot on the floor.", seconds: 10 },
+        { text: "Square your hips toward the floor.", seconds: 8 },
+        { text: "Walk your hands forward and fold over the front leg.", seconds: 10 },
+        { text: "Breathe deeply into the hip. Hold.", seconds: 60 },
+        { text: "Come up slowly and switch sides.", seconds: 60 },
+      ],
+    },
+    {
+      id: "butterfly",
+      title: "Butterfly Fold",
+      bodyPart: "hips",
+      duration: 3,
+      difficulty: "Gentle",
+      image: "stretches/butterfly.jpg",
+      description: "Opens the inner thighs and groin.",
+      steps: [
+        { text: "Sit tall. Bring the soles of your feet together.", seconds: 8 },
+        { text: "Let your knees fall open toward the floor.", seconds: 5 },
+        { text: "Hold your ankles with both hands.", seconds: 5 },
+        { text: "Hinge at the hips and fold forward.", seconds: 10 },
+        { text: "Breathe and soften.", seconds: 60 },
+        { text: "Rise slowly.", seconds: 8 },
+      ],
+    },
+    {
+      id: "forward-fold",
+      title: "Standing Forward Fold",
+      bodyPart: "legs",
+      duration: 3,
+      difficulty: "Moderate",
+      image: "stretches/forward-fold.jpg",
+      description: "Lengthens the entire back of the body.",
+      steps: [
+        { text: "Stand with feet hip-width apart.", seconds: 5 },
+        { text: "Hinge at the hips and fold forward.", seconds: 8 },
+        { text: "Let your head hang heavy. Soft knees okay.", seconds: 8 },
+        { text: "Hold opposite elbows and sway gently.", seconds: 60 },
+        { text: "Roll up slowly, stacking one vertebra at a time.", seconds: 15 },
+      ],
+    },
+    {
+      id: "low-lunge",
+      title: "Low Lunge Hip Flexor",
+      bodyPart: "legs",
+      duration: 3,
+      difficulty: "Moderate",
+      image: "stretches/low-lunge.jpg",
+      description: "Opens tight hip flexors from sitting all day.",
+      steps: [
+        { text: "Step your right foot forward into a lunge.", seconds: 8 },
+        { text: "Lower your left knee to the floor.", seconds: 5 },
+        { text: "Press your hips forward and down.", seconds: 10 },
+        { text: "Lift your chest tall. Reach arms overhead if comfortable.", seconds: 10 },
+        { text: "Hold. Breathe into the front of the hip.", seconds: 45 },
+        { text: "Come back to center. Switch sides.", seconds: 50 },
+      ],
+    },
+    // Front-only
+    {
+      id: "chest-doorway",
+      title: "Doorway Chest Opener",
+      bodyPart: "chest",
+      duration: 2,
+      difficulty: "Gentle",
+      image: "stretches/chest-doorway.jpg",
+      description: "Counteracts rounded shoulders from screens.",
+      steps: [
+        { text: "Stand in a doorway, arms bent at 90°.", seconds: 8 },
+        { text: "Place forearms against the door frame.", seconds: 5 },
+        { text: "Step one foot forward.", seconds: 5 },
+        { text: "Lean your chest through the doorway.", seconds: 10 },
+        { text: "Breathe and hold.", seconds: 45 },
+        { text: "Step back and release.", seconds: 8 },
+      ],
+    },
+  ];
+
+  const BODY_PART_LABELS = {
+    neck: "Neck",
+    shoulders: "Shoulders",
+    "upper-back": "Upper Back",
+    "lower-back": "Lower Back",
+    hips: "Hips",
+    legs: "Legs",
+    chest: "Chest",
+  };
+
+  // ---------------- State ----------------
+  const state = {
+    currentView: "home",
+    currentStretch: null,
+    listFilter: null,
+    navStack: [],
+    bodyView: "back", // back | front
+    favorites: loadFavorites(),
+    stats: loadStats(),
+    recent: loadRecent(),
+    // Session
+    session: {
+      active: false,
+      paused: false,
+      stepIdx: 0,
+      secondsLeft: 0,
+      intervalId: null,
+      voiceMuted: false,
+    },
+  };
+
+  // ---------------- LocalStorage ----------------
+  function loadFavorites() {
+    try { return JSON.parse(localStorage.getItem("ember.favs") || "[]"); }
+    catch { return []; }
+  }
+  function saveFavorites() {
+    localStorage.setItem("ember.favs", JSON.stringify(state.favorites));
+  }
+  function loadStats() {
+    try {
+      return JSON.parse(localStorage.getItem("ember.stats") || "null") || {
+        streak: 0, lastDate: null, sessions: 0, minutes: 0,
+      };
+    } catch {
+      return { streak: 0, lastDate: null, sessions: 0, minutes: 0 };
+    }
+  }
+  function saveStats() {
+    localStorage.setItem("ember.stats", JSON.stringify(state.stats));
+  }
+  function loadRecent() {
+    try { return JSON.parse(localStorage.getItem("ember.recent") || "[]"); }
+    catch { return []; }
+  }
+  function saveRecent() {
+    localStorage.setItem("ember.recent", JSON.stringify(state.recent));
+  }
+
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+  }
+  function yesterdayStr() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+  }
+  function updateStreak() {
+    const today = todayStr();
+    if (state.stats.lastDate === today) return;
+    if (state.stats.lastDate === yesterdayStr()) {
+      state.stats.streak += 1;
+    } else {
+      state.stats.streak = 1;
+    }
+    state.stats.lastDate = today;
+    saveStats();
+  }
+
+  // ---------------- Rendering ----------------
+  const el = (id) => document.getElementById(id);
+
+  function renderHome() {
+    el("streak-num").textContent = state.stats.streak;
+    const container = el("recent-stretches");
+    const recentIds = state.recent.length > 0
+      ? state.recent
+      : ["childs-pose", "pigeon", "shoulder-cross"];
+    container.innerHTML = "";
+    recentIds.slice(0, 3).forEach((id) => {
+      const s = STRETCHES.find((x) => x.id === id);
+      if (s) container.appendChild(makeStretchCard(s));
+    });
+  }
+
+  function makeStretchCard(s) {
+    const btn = document.createElement("button");
+    btn.className = "stretch-card";
+    btn.innerHTML = `
+      <div class="stretch-thumb" style="background-image: url('${s.image}')"></div>
+      <div class="stretch-info">
+        <h3>${s.title}</h3>
+        <div class="stretch-meta">
+          <span class="stretch-duration">${s.duration} min</span>
+          <span class="difficulty-badge difficulty-${s.difficulty}">${s.difficulty}</span>
+        </div>
+      </div>
+    `;
+    btn.addEventListener("click", () => openDetail(s.id));
+    return btn;
+  }
+
+  function renderList(bodyPart) {
+    el("list-title").textContent = BODY_PART_LABELS[bodyPart] || bodyPart;
+    const items = STRETCHES.filter((s) => s.bodyPart === bodyPart);
+    el("list-count").textContent = `${items.length} stretch${items.length === 1 ? "" : "es"}`;
+    const container = el("list-stretches");
+    container.innerHTML = "";
+    items.forEach((s) => container.appendChild(makeStretchCard(s)));
+  }
+
+  function renderDetail(id) {
+    const s = STRETCHES.find((x) => x.id === id);
+    if (!s) return;
+    state.currentStretch = s;
+    el("detail-title").textContent = s.title;
+    el("detail-duration").textContent = `${s.duration} min`;
+    const diffBadge = el("detail-difficulty");
+    diffBadge.textContent = s.difficulty;
+    diffBadge.className = `difficulty-badge difficulty-${s.difficulty}`;
+    el("detail-desc").textContent = s.description;
+    const hero = el("detail-hero");
+    hero.style.backgroundImage = `url('${s.image}')`;
+    // Steps
+    const stepsList = el("detail-steps");
+    stepsList.innerHTML = "";
+    s.steps.forEach((step, i) => {
+      const div = document.createElement("div");
+      div.className = "step-item";
+      const thumbUrl = `stretches/${s.id}/step${i + 1}.jpg`;
+      div.innerHTML = `
+        <div class="step-num">${i + 1}</div>
+        <div class="step-thumb" style="background-image:url('${thumbUrl}')"></div>
+        <div class="step-text">${step.text}</div>
+        <div class="step-time">${step.seconds}s</div>
+      `;
+      stepsList.appendChild(div);
+    });
+    // Fav state
+    const favBtn = el("detail-fav");
+    const isFav = state.favorites.includes(s.id);
+    favBtn.textContent = isFav ? "♥" : "♡";
+    favBtn.classList.toggle("active", isFav);
+  }
+
+  function renderFavorites() {
+    const container = el("favorites-list");
+    container.innerHTML = "";
+    const favs = STRETCHES.filter((s) => state.favorites.includes(s.id));
+    if (favs.length === 0) {
+      container.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">♡</div>
+          <p>No favorites yet.</p>
+          <p style="margin-top:6px;">Tap the heart on any stretch to save it.</p>
+        </div>`;
+      return;
+    }
+    favs.forEach((s) => container.appendChild(makeStretchCard(s)));
+  }
+
+  function renderExplore() {
+    const container = el("explore-list");
+    container.innerHTML = "";
+    STRETCHES.forEach((s) => container.appendChild(makeStretchCard(s)));
+  }
+
+  function renderProfile() {
+    el("profile-streak").textContent = state.stats.streak;
+    el("profile-sessions").textContent = state.stats.sessions;
+    el("profile-minutes").textContent = state.stats.minutes;
+  }
+
+  // ---------------- Navigation ----------------
+  function showView(view) {
+    ["home", "list", "detail", "favorites", "explore", "profile"].forEach((v) => {
+      el(`view-${v}`).classList.toggle("hidden", v !== view);
+    });
+    state.currentView = view;
+    // Update nav active state only for top-level views
+    document.querySelectorAll(".nav button").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.nav === view);
+    });
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  function goHome() { showView("home"); renderHome(); state.navStack = []; }
+  function openList(bodyPart) {
+    state.listFilter = bodyPart;
+    state.navStack.push("home");
+    renderList(bodyPart);
+    showView("list");
+  }
+  function openDetail(id) {
+    state.navStack.push(state.currentView);
+    renderDetail(id);
+    showView("detail");
+  }
+  function goBack() {
+    const prev = state.navStack.pop() || "home";
+    if (prev === "home") goHome();
+    else showView(prev);
+  }
+
+  // ---------------- Body map ----------------
+  function setupBodyMap() {
+    // Toggle front/back
+    document.querySelectorAll(".bodymap-toggle button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const view = btn.dataset.view;
+        state.bodyView = view;
+        document.querySelectorAll(".bodymap-toggle button").forEach((b) =>
+          b.classList.toggle("active", b === btn)
+        );
+        el("body-img").setAttribute("href", `body-${view}.png`);
+        el("hotspots-back").style.display = view === "back" ? "" : "none";
+        el("hotspots-front").style.display = view === "front" ? "" : "none";
+      });
+    });
+
+    // Hotspot click + hover labels
+    const label = el("hotspot-label");
+    document.querySelectorAll(".hotspot").forEach((h) => {
+      h.addEventListener("click", () => openList(h.dataset.part));
+      h.addEventListener("mouseenter", (e) => {
+        label.textContent = BODY_PART_LABELS[h.dataset.part] || h.dataset.part;
+        const rect = h.getBoundingClientRect();
+        const wrap = document.querySelector(".bodymap-wrap").getBoundingClientRect();
+        label.style.left = `${rect.left - wrap.left + rect.width / 2}px`;
+        label.style.top = `${rect.top - wrap.top + rect.height / 2}px`;
+        label.classList.add("visible");
+      });
+      h.addEventListener("mouseleave", () => label.classList.remove("visible"));
+    });
+  }
+
+  // ---------------- Session ----------------
+  function startSession() {
+    if (!state.currentStretch) return;
+    state.session.active = true;
+    state.session.paused = false;
+    state.session.stepIdx = 0;
+    state.session.secondsLeft = state.currentStretch.steps[0].seconds;
+    el("session").classList.remove("hidden");
+    el("session-active").style.display = "";
+    el("session-complete-screen").style.display = "none";
+    el("session-controls").style.display = "flex";
+    renderSessionStep();
+    startSessionTick();
+    speak(state.currentStretch.steps[0].text);
+  }
+
+  function renderSessionStep() {
+    const s = state.currentStretch;
+    const step = s.steps[state.session.stepIdx];
+    el("session-progress").textContent = `Step ${state.session.stepIdx + 1} of ${s.steps.length}`;
+    el("session-step-text").textContent = step.text;
+    el("session-image").style.backgroundImage = `url('stretches/${s.id}/step${state.session.stepIdx + 1}.jpg')`;
+    updateTimerRing();
+  }
+
+  function updateTimerRing() {
+    const step = state.currentStretch.steps[state.session.stepIdx];
+    const total = step.seconds;
+    const left = state.session.secondsLeft;
+    el("timer-number").textContent = left;
+    const ring = el("ring-progress");
+    const circumference = 2 * Math.PI * 90;
+    const offset = circumference * (1 - left / total);
+    ring.style.strokeDasharray = circumference;
+    ring.style.strokeDashoffset = offset;
+  }
+
+  function startSessionTick() {
+    if (state.session.intervalId) clearInterval(state.session.intervalId);
+    state.session.intervalId = setInterval(() => {
+      if (state.session.paused) return;
+      state.session.secondsLeft -= 1;
+      updateTimerRing();
+      if (state.session.secondsLeft <= 0) {
+        nextStep();
+      }
+    }, 1000);
+  }
+
+  function nextStep() {
+    const s = state.currentStretch;
+    if (state.session.stepIdx >= s.steps.length - 1) {
+      completeSession();
+      return;
+    }
+    state.session.stepIdx += 1;
+    state.session.secondsLeft = s.steps[state.session.stepIdx].seconds;
+    chime();
+    renderSessionStep();
+    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+    speak(s.steps[state.session.stepIdx].text);
+  }
+
+  function prevStep() {
+    if (state.session.stepIdx <= 0) return;
+    state.session.stepIdx -= 1;
+    state.session.secondsLeft = state.currentStretch.steps[state.session.stepIdx].seconds;
+    renderSessionStep();
+    speak(state.currentStretch.steps[state.session.stepIdx].text);
+  }
+
+  function togglePause() {
+    state.session.paused = !state.session.paused;
+    el("session-play").textContent = state.session.paused ? "▶" : "⏸";
+    if (state.session.paused) {
+      speechSynthesis.cancel();
+    }
+  }
+
+  function completeSession() {
+    clearInterval(state.session.intervalId);
+    state.session.intervalId = null;
+    state.session.active = false;
+    // Stats
+    state.stats.sessions += 1;
+    state.stats.minutes += state.currentStretch.duration;
+    updateStreak();
+    saveStats();
+    // Recent
+    state.recent = [state.currentStretch.id, ...state.recent.filter((x) => x !== state.currentStretch.id)].slice(0, 6);
+    saveRecent();
+    // UI
+    el("session-active").style.display = "none";
+    el("session-controls").style.display = "none";
+    el("session-complete-screen").style.display = "block";
+    el("complete-summary").textContent = `+${state.currentStretch.duration} min · ${state.stats.streak}-day streak 🔥`;
+    chimeComplete();
+    if (navigator.vibrate) navigator.vibrate([200, 80, 200, 80, 400]);
+    speak(`Session complete. Nice work.`);
+    setTimeout(() => closeSession(), 3500);
+  }
+
+  function closeSession() {
+    clearInterval(state.session.intervalId);
+    state.session.intervalId = null;
+    state.session.active = false;
+    speechSynthesis.cancel();
+    el("session").classList.add("hidden");
+    renderHome();
+  }
+
+  // ---------------- Voice + sound ----------------
+  function speak(text) {
+    if (state.session.voiceMuted) return;
+    if (!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.95;
+    u.pitch = 1.0;
+    u.volume = 0.9;
+    // Prefer a calm-sounding voice
+    const voices = speechSynthesis.getVoices();
+    const preferred = voices.find((v) => /Samantha|Google US English|Microsoft Aria|Microsoft Jenny/i.test(v.name));
+    if (preferred) u.voice = preferred;
+    speechSynthesis.speak(u);
+  }
+
+  let audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AC();
+    }
+    return audioCtx;
+  }
+  function chime() {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.4);
+  }
+  function chimeComplete() {
+    const ctx = getAudio();
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+      setTimeout(() => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.4);
+      }, i * 120);
+    });
+  }
+
+  // ---------------- Favorites ----------------
+  function toggleFavorite() {
+    if (!state.currentStretch) return;
+    const id = state.currentStretch.id;
+    const idx = state.favorites.indexOf(id);
+    if (idx >= 0) {
+      state.favorites.splice(idx, 1);
+      showToast("Removed from favorites");
+    } else {
+      state.favorites.push(id);
+      showToast("Saved to favorites ♥");
+    }
+    saveFavorites();
+    renderDetail(id);
+  }
+
+  // ---------------- Toast ----------------
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = el("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 2000);
+  }
+
+  // ---------------- Body scan ----------------
+  function bodyScan() {
+    const options = ["neck", "shoulders", "upper-back", "lower-back", "hips", "legs"];
+    const pick = options[Math.floor(Math.random() * options.length)];
+    showToast(`Recommendation: ${BODY_PART_LABELS[pick]}`);
+    setTimeout(() => openList(pick), 800);
+  }
+
+  // ---------------- Events ----------------
+  function init() {
+    setupBodyMap();
+
+    // Back buttons
+    document.querySelectorAll("[data-back]").forEach((b) =>
+      b.addEventListener("click", goBack)
+    );
+
+    // Nav
+    document.querySelectorAll(".nav button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const nav = btn.dataset.nav;
+        state.navStack = [];
+        if (nav === "home") { renderHome(); showView("home"); }
+        else if (nav === "explore") { renderExplore(); showView("explore"); }
+        else if (nav === "favorites") { renderFavorites(); showView("favorites"); }
+        else if (nav === "profile") { renderProfile(); showView("profile"); }
+      });
+    });
+
+    // View all → explore
+    el("view-all-btn").addEventListener("click", () => {
+      renderExplore();
+      state.navStack.push("home");
+      showView("explore");
+    });
+
+    // Body scan
+    el("body-scan-btn").addEventListener("click", bodyScan);
+
+    // Detail actions
+    el("detail-fav").addEventListener("click", toggleFavorite);
+    el("start-session-btn").addEventListener("click", startSession);
+
+    // Session controls
+    el("session-close").addEventListener("click", closeSession);
+    el("session-play").addEventListener("click", togglePause);
+    el("session-next").addEventListener("click", nextStep);
+    el("session-prev").addEventListener("click", prevStep);
+    el("session-mute").addEventListener("click", () => {
+      state.session.voiceMuted = !state.session.voiceMuted;
+      el("session-mute").textContent = state.session.voiceMuted ? "🔇" : "🔊";
+      if (state.session.voiceMuted) speechSynthesis.cancel();
+    });
+
+    // Load voices (Chrome loads async)
+    if ("speechSynthesis" in window) {
+      speechSynthesis.onvoiceschanged = () => {};
+    }
+
+    // Initial render
+    renderHome();
+    showView("home");
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
